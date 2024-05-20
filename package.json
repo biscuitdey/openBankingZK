@@ -16,11 +16,14 @@
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/jest/bin/jest --runInBand",
-    "test:e2e": "jest --config ./test/jest-e2e.json"
+    "test:e2e": "jest --config ./test/jest-e2e.json",
+    "snarkjs:ptau": "./zeroKnowledgeArtifacts/scripts/ptau.sh",
+    "snarkjs:circuit": "./zeroKnowledgeArtifacts/scripts/circuits/$PROTOCOL.sh"
   },
   "dependencies": {
     "@nestjs/common": "^10.3.2",
     "@nestjs/core": "^10.3.2",
+    "@nestjs/cqrs": "^10.2.7",
     "@nestjs/platform-express": "^10.3.2",
     "reflect-metadata": "^0.2.1",
     "rxjs": "^7.8.1"
