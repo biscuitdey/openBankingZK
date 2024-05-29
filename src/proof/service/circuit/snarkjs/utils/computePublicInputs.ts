@@ -11,9 +11,8 @@ export const computeEddsaSigPublicInputs = async (inputs: {
   publicKey: string;
 }) => {
   const eddsa = await buildEddsa();
-
   const hashedPayload = crypto
-    .createHash(`${process.env.HASH_ALGH}`)
+    .createHash(`${process.env.HASH_ALG}`)
     .update(JSON.stringify(inputs.payload))
     .digest();
 

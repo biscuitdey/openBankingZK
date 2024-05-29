@@ -1,7 +1,7 @@
 pragma circom 2.1.5;
 
-include "../../../../../../node_modules/circomlib/circuits/comparators.circom";
-include "../../../../../../node_modules/circomlib/circuits/eddsa.circom";
+include "../../../../../node_modules/circomlib/circuits/comparators.circom";
+include "../../../../../node_modules/circomlib/circuits/eddsa.circom";
 include "./utils/arithmeticOperators.circom";
 
 template bankProof(){
@@ -33,8 +33,8 @@ template bankProof(){
 	//2. Verify Bank Name
 	component bankNameVerifier = IsEqual();
 
-	bankNameVerifier.in[0] <== privatebankName;
-	bankNameVerifier.in[1] <== publicbankName;	
+	bankNameVerifier.in[0] <== privateBankName;
+	bankNameVerifier.in[1] <== publicBankName;	
 	
 	var isBankNameVerified = bankNameVerifier.out;
 
@@ -52,7 +52,7 @@ template bankProof(){
 	ifscVerifier.in[0] <== privateIFSC;
 	ifscVerifier.in[1] <== publicIFSC;	
 	
-	var isIFSCVerified = isfcVerifier.out;
+	var isIFSCVerified = ifscVerifier.out;
 
 
 	//5. Verify Eddsa signature

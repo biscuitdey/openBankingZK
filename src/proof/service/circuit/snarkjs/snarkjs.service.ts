@@ -5,6 +5,7 @@ import { ICircuitService } from '../circuitService.interface';
 import { computeEddsaSigPublicInputs } from './utils/computePublicInputs';
 import * as snarkjs from 'snarkjs';
 import * as fs from 'fs';
+import * as crypto from 'crypto';
 import { Payload } from 'src/proof/models/payload';
 
 @Injectable()
@@ -120,7 +121,22 @@ export class SnarkjsCircuitService implements ICircuitService {
     //1. Eddsa signature
     const { message, A, R8, S } = await computeEddsaSigPublicInputs(inputs);
 
+    //2. Name
+    const privateName = this.hash(inputs.payload.name);
+
+    const privateBankName = this.hash(inputs.payload.bankName);
+
+    const privateIFSC = this.hash(inputs.payload.ifsc);
+
     const preparedInputs = {
+      privateName,
+      publicName: privateName,
+      privateBankName,
+      publicBankName: privateBankName,
+      privateAccountNumber: inputs.payload.accountNumber,
+      publicAccountNumber: inputs.payload.accountNumber,
+      privateIFSC,
+      publicIFSC: privateIFSC,
       message,
       A,
       R8,
@@ -128,6 +144,16 @@ export class SnarkjsCircuitService implements ICircuitService {
     };
 
     return preparedInputs;
+  }
+
+  private hash(input: string): bigint {
+    const hashedInput = crypto
+      .createHash(`${process.env.HASH_ALG}`)
+      .update(input)
+      .digest()
+      .toString('hex');
+
+    return BigInt('0x' + hashedInput);
   }
 
   private calculateStringCharCodeSum(status: string): number {
