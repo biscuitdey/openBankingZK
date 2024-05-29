@@ -4,9 +4,8 @@ import { Proof } from '../../../models/proof';
 import { ICircuitService } from '../circuitService.interface';
 import { computeEddsaSigPublicInputs } from './utils/computePublicInputs';
 import * as snarkjs from 'snarkjs';
-import { Transaction } from '../../../../transactions/models/transaction';
-import MerkleTree from 'merkletreejs';
 import * as fs from 'fs';
+import { Payload } from 'src/proof/models/payload';
 
 @Injectable()
 export class SnarkjsCircuitService implements ICircuitService {
@@ -22,8 +21,9 @@ export class SnarkjsCircuitService implements ICircuitService {
 
   public async createWitness(
     inputs: {
-      tx: Transaction;
-      merkelizedPayload: MerkleTree;
+      payload: Payload;
+      signature: string;
+      publicKey: string;
     },
     circuitName: string,
     pathToCircuit: string,
@@ -103,78 +103,24 @@ export class SnarkjsCircuitService implements ICircuitService {
 
   private async prepareInputs(
     inputs: {
-      tx: Transaction;
-      merkelizedPayload: MerkleTree;
+      payload: Payload;
+      signature: string;
+      publicKey: string;
     },
     circuitName: string,
   ): Promise<object> {
     return await this[circuitName](inputs);
   }
 
-  // TODO: Mil5 - How to parametrize this for different use-cases?
-  private async workstep1(inputs: {
-    tx: Transaction;
-    merkelizedPayload: MerkleTree;
-  }): Promise<object> {
-    //1. Ecdsa signature
-    const { message, A, R8, S } = await computeEddsaSigPublicInputs(inputs.tx);
-
-    //2. Items
-    const payload = JSON.parse(inputs.tx.payload);
-
-    const itemPrices: number[] = [];
-    const itemAmount: number[] = [];
-
-    payload.items.forEach((item: object) => {
-      itemPrices.push(item['price']);
-      itemAmount.push(item['amount']);
-    });
-
-    const preparedInputs = {
-      invoiceStatus: this.calculateStringCharCodeSum(payload.status),
-      invoiceAmount: payload.amount,
-      itemPrices,
-      itemAmount,
-      message,
-      A,
-      R8,
-      S,
-    };
-
-    return preparedInputs;
-  }
-
-  private async workstep2(inputs: {
-    tx: Transaction;
-    merkelizedPayload: MerkleTree;
+  private async bankProof(inputs: {
+    payload: Payload;
+    signature: string;
+    publicKey: string;
   }): Promise<object> {
     //1. Eddsa signature
-    const { message, A, R8, S } = await computeEddsaSigPublicInputs(inputs.tx);
-
-    const payload = JSON.parse(inputs.tx.payload);
+    const { message, A, R8, S } = await computeEddsaSigPublicInputs(inputs);
 
     const preparedInputs = {
-      invoiceStatus: payload.status,
-      message,
-      A,
-      R8,
-      S,
-    };
-
-    return preparedInputs;
-  }
-
-  private async workstep3(inputs: {
-    tx: Transaction;
-    merkelizedPayload: MerkleTree;
-  }): Promise<object> {
-    //1. Eddsa signature
-    const { message, A, R8, S } = await computeEddsaSigPublicInputs(inputs.tx);
-
-    const payload = JSON.parse(inputs.tx.payload);
-
-    const preparedInputs = {
-      invoiceStatus: payload.status,
       message,
       A,
       R8,

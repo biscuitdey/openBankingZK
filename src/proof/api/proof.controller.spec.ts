@@ -18,7 +18,7 @@ import { SubjectsProfile } from '../../identity/bpiSubjects/subjects.profile';
 import { BpiMessageAgent } from '../agents/bpiMessages.agent';
 import { BpiMessageStorageAgent } from '../agents/bpiMessagesStorage.agent';
 import { MessagingAgent } from '../agents/messaging.agent';
-import { CreateBpiMessageCommandHandler } from '../capabilities/createBpiMessage/createBpiMessageCommand.handler';
+import { CreateBpiMessageCommandHandler } from '../capabilities/createProof/createProofCommand.handler';
 import { DeleteBpiMessageCommandHandler } from '../capabilities/deleteBpiMessage/deleteBpiMessageCommand.handler';
 import { GetBpiMessageByIdQueryHandler } from '../capabilities/getBpiMessageById/getBpiMessageByIdQuery.handler';
 import { UpdateBpiMessageCommandHandler } from '../capabilities/updateBpiMessage/updateBpiMessageCommand.handler';
@@ -26,7 +26,7 @@ import { CommunicationModule } from '../communication.module';
 import { CommunicationProfile } from '../communicaton.profile';
 import { NatsMessagingClient } from '../messagingClients/natsMessagingClient';
 import { BpiMessage } from '../models/bpiMessage';
-import { CreateBpiMessageDto } from './dtos/request/createBpiMessage.dto';
+import { CreateBpiMessageDto } from './dtos/request/createProof.dto';
 import { UpdateBpiMessageDto } from './dtos/request/updateBpiMessage.dto';
 import {
   BPI_MESSAGE_ALREADY_EXISTS,

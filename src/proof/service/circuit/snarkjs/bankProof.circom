@@ -4,7 +4,7 @@ include "../../../../../../node_modules/circomlib/circuits/comparators.circom";
 include "../../../../../../node_modules/circomlib/circuits/eddsa.circom";
 include "./utils/arithmeticOperators.circom";
 
-template Workstep1(items){
+template bankProof(){
 	signal input invoiceStatus;
 	signal input invoiceAmount;
 	signal input itemPrices[items];
@@ -96,4 +96,4 @@ template AmountVerifier(items){
 
 
 //declaring the public inputs
-component main = Workstep1(4);
+component main = bankProof();
