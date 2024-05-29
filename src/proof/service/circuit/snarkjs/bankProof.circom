@@ -5,10 +5,14 @@ include "../../../../../../node_modules/circomlib/circuits/eddsa.circom";
 include "./utils/arithmeticOperators.circom";
 
 template bankProof(){
-	signal input invoiceStatus;
-	signal input invoiceAmount;
-	signal input itemPrices[items];
-	signal input itemAmount[items];
+	signal input privateName;
+	signal input publicName;
+	signal input privateBankName;
+	signal input publicBankName;
+	signal input privateAccountNumber;
+	signal input publicAccountNumber;
+	signal input privateIFSC;
+	signal input publicIFSC;
 
 	//Signature inputs
 	signal input message[256];
@@ -18,22 +22,40 @@ template bankProof(){
 
 	signal output isVerified;
 
-   	//1. Status == NEW
-	component statusVerifier = StatusVerifier();
-	statusVerifier.invoiceStatus <== invoiceStatus;	
-	var isStatusVerified = statusVerifier.verified;
+   	//1. Verify Name
+	component nameVerifier = IsEqual();
 
-	//2. InvoiceAmount == itemPrices * itemAmount
-	component amountVerifier = AmountVerifier(items);
-	amountVerifier.invoiceAmount <== invoiceAmount;
-	for(var i = 0; i < items; i++){
-		amountVerifier.itemPrices[i] <== itemPrices[i];
-		amountVerifier.itemAmount[i] <== itemAmount[i];
-	}
+	nameVerifier.in[0] <== privateName;
+	nameVerifier.in[1] <== publicName;	
+	
+	var isNameVerified = nameVerifier.out;
 
-	var isInvoiceAmountVerified = amountVerifier.verified;
+	//2. Verify Bank Name
+	component bankNameVerifier = IsEqual();
 
-	//3. Verify Eddsa signature
+	bankNameVerifier.in[0] <== privatebankName;
+	bankNameVerifier.in[1] <== publicbankName;	
+	
+	var isBankNameVerified = bankNameVerifier.out;
+
+	//3. Verify Account Number
+	component accountNumberVerifier = IsEqual();
+
+	accountNumberVerifier.in[0] <== privateAccountNumber;
+	accountNumberVerifier.in[1] <== publicAccountNumber;	
+	
+	var isAccountNumberVerified = accountNumberVerifier.out;
+
+	//4. Verify IFSC
+	component ifscVerifier = IsEqual();
+
+	ifscVerifier.in[0] <== privateIFSC;
+	ifscVerifier.in[1] <== publicIFSC;	
+	
+	var isIFSCVerified = isfcVerifier.out;
+
+
+	//5. Verify Eddsa signature
 	var verifiedFlag = 0;
 	component eddsaSignatureVerifier = EdDSAVerifier(256);
 	for(var i = 0; i < 256; i++){
@@ -48,52 +70,17 @@ template bankProof(){
 	isEqualSignature.in[1] <== 1;
 	var isSignatureVerified = isEqualSignature.out;	
 
-	component mul = Mul(3);
-	mul.nums[0] <== isStatusVerified;
-	mul.nums[1] <== isInvoiceAmountVerified;
-	mul.nums[2] <== isSignatureVerified;
+	component mul = Mul(5);
+	mul.nums[0] <== isNameVerified;
+	mul.nums[1] <== isBankNameVerified;
+	mul.nums[2] <== isAccountNumberVerified; 
+	mul.nums[3] <== isIFSCVerified;
+	mul.nums[4] <== isSignatureVerified;
 
 	isVerified <== mul.result; 
 	
 }
 
-template StatusVerifier(){
-	signal input invoiceStatus;
-	
-	signal output verified;
-
-	//NEW (as decimal utf-8 [78, 69, 87])
-	var status = 234; // status= 78 + 69 + 87
-
-	component isStatusEqualNew = IsEqual();
-
-	isStatusEqualNew.in[0] <== status;
-	isStatusEqualNew.in[1] <== invoiceStatus;	
-	
-	verified <== isStatusEqualNew.out;
-
-}
-
-template AmountVerifier(items){
-	signal input invoiceAmount;
-	signal input itemPrices[items];
-	signal input itemAmount[items];
-
-	signal output verified;
-
-	component add = Add(items);
-	for(var i = 0; i < items; i++){
-		add.nums[i] <== itemPrices[i] * itemAmount[i]; 
-	}
-
-	component isItemAmountEqualInvoice = IsEqual();
-
-	isItemAmountEqualInvoice.in[0] <== invoiceAmount;
-	isItemAmountEqualInvoice.in[1] <== add.result;	
-	
-	verified <== isItemAmountEqualInvoice.out;
-}
-
 
 //declaring the public inputs
-component main = bankProof();
+component main {public [publicName,publicBankName, publicAccountNumber, publicIFSC]} = bankProof();
