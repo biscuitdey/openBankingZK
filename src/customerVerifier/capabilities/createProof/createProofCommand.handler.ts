@@ -1,5 +1,5 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { ProofAgent } from '../../agent/proof.agent';
+import { ProofAgent } from '../../agents/customerVerifier.agent';
 import { CreateProofCommand } from './createProof.command';
 import { Witness } from '../../models/witness';
 

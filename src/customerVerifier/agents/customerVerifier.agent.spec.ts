@@ -1,6 +1,6 @@
 import { DeepMockProxy, mockDeep } from 'jest-mock-extended';
 import { BpiMessageType } from '../models/bpiMessageType.enum';
-import { MessagingAgent } from './proof.agent';
+import { MessagingAgent } from './customerVerifier.agent';
 import { IMessagingClient } from '../messagingClients/messagingClient.interface';
 import { CommandBus } from '@nestjs/cqrs';
 import { Mapper } from '@automapper/core';

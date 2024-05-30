@@ -4,7 +4,7 @@ import { CreateProofCommand } from '../capabilities/createProof/createProof.comm
 import { CreateProofDto } from './dtos/request/createProof.dto';
 
 @Controller('proof')
-export class ProofController {
+export class CustomerVerifierController {
   constructor(
     private commandBus: CommandBus,
     private queryBus: QueryBus,

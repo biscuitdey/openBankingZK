@@ -13,8 +13,8 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Proof {
+model CustomerVerifier {
   id                String     @id @default(uuid())
-  customerPublicKey String
-  proofValue        String
+  publicKey         String     @unique
+  proof             String
 }

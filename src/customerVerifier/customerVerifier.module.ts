@@ -14,4 +14,4 @@ import { LoggingModule } from '../shared/logging/logging.module';
   ],
   exports: ['ICircuitService'],
 })
-export class ProofModule {}
+export class CustomerVerifierModule {}

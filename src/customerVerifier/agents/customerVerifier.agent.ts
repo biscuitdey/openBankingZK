@@ -9,7 +9,7 @@ import { ICircuitService } from '../service/circuit/circuitService.interface';
 import 'dotenv/config';
 
 @Injectable()
-export class ProofAgent {
+export class CustomerVerifierAgent {
   constructor(
     @Inject('ICircuitService') private readonly circuitService: ICircuitService,
     private readonly logger: LoggingService,

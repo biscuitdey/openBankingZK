@@ -6,7 +6,7 @@ import { computeEddsaSigPublicInputs } from './utils/computePublicInputs';
 import * as snarkjs from 'snarkjs';
 import * as fs from 'fs';
 import * as crypto from 'crypto';
-import { Payload } from 'src/proof/models/payload';
+import { Payload } from 'src/customerVerifier/models/payload';
 
 @Injectable()
 export class SnarkjsCircuitService implements ICircuitService {
