@@ -3,10 +3,14 @@ import { INVALID_SIGNATURE } from '../api/err.messages';
 import { LoggingService } from '../../shared/logging/logging.service';
 import { buildBabyjub, buildEddsa } from 'circomlibjs';
 import * as crypto from 'crypto';
+import { v4 } from 'uuid';
 import { Payload } from '../models/payload';
 import { Witness } from '../models/witness';
 import { ICircuitService } from '../service/circuit/circuitService.interface';
 import 'dotenv/config';
+import { PublicWitness } from '../models/publicWitness';
+import { CustomerVerifier } from '../models/customerVerifier';
+import { Proof } from '../models/proof';
 
 @Injectable()
 export class CustomerVerifierAgent {
@@ -61,6 +65,13 @@ export class CustomerVerifierAgent {
     return isValid;
   }
 
+  async createCustomerVerifier(
+    publicKey: string,
+    proof: Proof,
+  ): Promise<CustomerVerifier> {
+    return new CustomerVerifier(v4(), publicKey, proof);
+  }
+
   async createProofWitness(
     payload: Payload,
     signature: string,
@@ -88,6 +99,12 @@ export class CustomerVerifierAgent {
     );
 
     return witness;
+  }
+
+  async getPublicWitness(witness: Witness): Promise<PublicWitness> {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { proof, ...publicWitness } = witness;
+    return publicWitness as PublicWitness;
   }
 
   private constructCircuitPathsFromWorkstepName(name: string): {

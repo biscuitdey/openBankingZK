@@ -1,13 +1,19 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { ProofAgent } from '../../agents/customerVerifier.agent';
+import { CustomerVerifierAgent } from '../../agents/customerVerifier.agent';
 import { CreateProofCommand } from './createProof.command';
 import { Witness } from '../../models/witness';
+import { CustomerVerifierStorageAgent } from '../../agents/customerVerifierStorage.agent';
+import { CustomerVerifier } from '../../models/customerVerifier';
+import { PublicWitness } from '../../models/publicWitness';
 
 @CommandHandler(CreateProofCommand)
 export class CreateProofCommandHandler
   implements ICommandHandler<CreateProofCommand>
 {
-  constructor(private readonly agent: ProofAgent) {}
+  constructor(
+    private readonly agent: CustomerVerifierAgent,
+    private readonly storageAgent: CustomerVerifierStorageAgent,
+  ) {}
 
   async execute(command: CreateProofCommand) {
     this.agent.throwIfSignatureVerificationFails(
@@ -22,6 +28,14 @@ export class CreateProofCommandHandler
       command.publicKey,
     );
 
-    return witness;
+    const customerVerfier: CustomerVerifier =
+      await this.agent.createCustomerVerifier(command.publicKey, witness.proof);
+
+    await this.storageAgent.storeCustomerVerifier(customerVerfier);
+
+    const publicWitness: PublicWitness =
+      await this.agent.getPublicWitness(witness);
+
+    return publicWitness;
   }
 }
