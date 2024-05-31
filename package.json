@@ -36,7 +36,8 @@
     "dotenv": "^16.4.5",
     "jest-mock-extended": "^3.0.7",
     "rxjs": "^7.8.1",
-    "snarkjs": "^0.7.4"
+    "snarkjs": "^0.7.4",
+    "tslog": "^4.9.2"
   },
   "devDependencies": {
     "@nestjs/cli": "^10.3.1",

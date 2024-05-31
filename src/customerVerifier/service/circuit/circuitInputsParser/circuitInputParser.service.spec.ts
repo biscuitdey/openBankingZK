@@ -1,5 +1,5 @@
 import { DeepMockProxy, mockDeep } from 'jest-mock-extended';
-import { LoggingService } from '../../../../../shared/logging/logging.service';
+import { LoggingService } from '../../../../shared/logging/logging.service';
 import { CircuitInputsParserService } from './circuitInputParser.service';
 
 let cips: CircuitInputsParserService;

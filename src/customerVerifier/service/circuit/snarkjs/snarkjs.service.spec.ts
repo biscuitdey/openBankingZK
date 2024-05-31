@@ -20,9 +20,6 @@ describe('SnarkjsService', () => {
     const packedPublicKey = babyJub.packPoint(publicKeyPoints);
     const eddsaPublicKey = Buffer.from(packedPublicKey).toString('hex');
 
-    console.log('Private Key: ' + Buffer.from(privateKey).toString('hex'));
-    console.log('Public Key: ' + eddsaPublicKey);
-
     const payload: Payload = {
       name: 'Biswashree Dey',
       bankName: 'HDFC Bank',
@@ -38,8 +35,6 @@ describe('SnarkjsService', () => {
     const eddsaSignature = eddsa.signPedersen(privateKey, hashedPayload);
     const packedSignature = eddsa.packSignature(eddsaSignature);
     const signature = Buffer.from(packedSignature).toString('hex');
-
-    console.log(signature);
 
     inputs = { payload, signature, publicKey: eddsaPublicKey };
   });
@@ -68,9 +63,6 @@ describe('SnarkjsService', () => {
       pathToWitnessFile,
     );
 
-    console.log(witness.proof);
-    console.log(witness.publicInputs);
-    console.log(witness.verificationKey);
     expect(typeof witness).toEqual('object');
   });
 

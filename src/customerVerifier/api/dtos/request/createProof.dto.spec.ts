@@ -7,9 +7,11 @@ describe('CreateProofDto', () => {
   it('should return error in case id not provided.', async () => {
     // Arrange
     const dto = {
-      bankName: 'def',
-      accountNumber: '123',
-      ifsc: '456',
+      payload: {
+        bankName: 'def',
+        accountNumber: '123',
+        ifsc: '456',
+      },
       signature: '123456',
       publicKey: '654321',
     };
@@ -20,18 +22,20 @@ describe('CreateProofDto', () => {
 
     // Assert
     expect(errors.length).toBe(1);
-    expect(errors[0].property).toEqual('name');
+    expect(errors[0].property).toEqual('payload');
     expect(errors[0].constraints?.isNotEmpty).toContain(
-      SHOULD_NOT_BE_EMPTY_VALIDATION_MESSAGE('name'),
+      SHOULD_NOT_BE_EMPTY_VALIDATION_MESSAGE('payload'),
     );
   });
 
   it('should return error in case bank name not provided.', async () => {
     // Arrange
     const dto = {
-      name: 'abc',
-      accountNumber: '123',
-      ifsc: '456',
+      payload: {
+        name: 'abc',
+        accountNumber: '123',
+        ifsc: '456',
+      },
       signature: '123456',
       publicKey: '654321',
     };
@@ -42,18 +46,20 @@ describe('CreateProofDto', () => {
 
     // Assert
     expect(errors.length).toBe(1);
-    expect(errors[0].property).toEqual('bankName');
+    expect(errors[0].property).toEqual('payload');
     expect(errors[0].constraints?.isNotEmpty).toContain(
-      SHOULD_NOT_BE_EMPTY_VALIDATION_MESSAGE('bankName'),
+      SHOULD_NOT_BE_EMPTY_VALIDATION_MESSAGE('payload'),
     );
   });
 
   it('should return error in case account number not provided.', async () => {
     // Arrange
     const dto = {
-      name: 'abc',
-      bankName: 'def',
-      ifsc: '456',
+      payload: {
+        name: 'abc',
+        bankName: 'def',
+        ifsc: '456',
+      },
       signature: '123456',
       publicKey: '654321',
     };
@@ -64,18 +70,20 @@ describe('CreateProofDto', () => {
 
     // Assert
     expect(errors.length).toBe(1);
-    expect(errors[0].property).toEqual('accountNumber');
+    expect(errors[0].property).toEqual('payload');
     expect(errors[0].constraints?.isNotEmpty).toContain(
-      SHOULD_NOT_BE_EMPTY_VALIDATION_MESSAGE('accountNumber'),
+      SHOULD_NOT_BE_EMPTY_VALIDATION_MESSAGE('payload'),
     );
   });
 
   it('should return error in case ifsc not provided.', async () => {
     // Arrange
     const dto = {
-      name: 'abc',
-      bankName: 'def',
-      accountNumber: '123',
+      payload: {
+        name: 'abc',
+        bankName: 'def',
+        accountNumber: '123',
+      },
       signature: '123456',
       publicKey: '654321',
     };
@@ -86,19 +94,21 @@ describe('CreateProofDto', () => {
 
     // Assert
     expect(errors.length).toBe(1);
-    expect(errors[0].property).toEqual('ifsc');
+    expect(errors[0].property).toEqual('payload');
     expect(errors[0].constraints?.isNotEmpty).toContain(
-      SHOULD_NOT_BE_EMPTY_VALIDATION_MESSAGE('ifsc'),
+      SHOULD_NOT_BE_EMPTY_VALIDATION_MESSAGE('payload'),
     );
   });
 
   it('should return error in case signature not provided.', async () => {
     // Arrange
     const dto = {
-      name: 'abc',
-      bankName: 'def',
-      accountNumber: '123',
-      ifsc: '456',
+      payload: {
+        name: 'abc',
+        bankName: 'def',
+        accountNumber: '123',
+        ifsc: '456',
+      },
       publicKey: '654321',
     };
     const createProofDto = plainToInstance(CreateProofDto, dto);
@@ -117,10 +127,12 @@ describe('CreateProofDto', () => {
   it('should return error in case public key not provided.', async () => {
     // Arrange
     const dto = {
-      name: 'abc',
-      bankName: 'def',
-      accountNumber: '123',
-      ifsc: '456',
+      payload: {
+        name: 'abc',
+        bankName: 'def',
+        accountNumber: '123',
+        ifsc: '456',
+      },
       signature: '123456',
     };
     const createProofDto = plainToInstance(CreateProofDto, dto);
@@ -139,10 +151,12 @@ describe('CreateProofDto', () => {
   it('should return no error if all required properties provided.', async () => {
     // Arrange
     const dto = {
-      name: 'abc',
-      bankName: 'def',
-      accountNumber: '123',
-      ifsc: '456',
+      payload: {
+        name: 'abc',
+        bankName: 'def',
+        accountNumber: '123',
+        ifsc: '456',
+      },
       signature: '123456',
       publicKey: '654321',
     };

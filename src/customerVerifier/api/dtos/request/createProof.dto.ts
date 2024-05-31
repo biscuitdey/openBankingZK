@@ -1,9 +1,10 @@
 import { Type } from 'class-transformer';
-import { IsNotEmpty } from 'class-validator';
+import { IsNotEmpty, ValidateNested } from 'class-validator';
 import { PayloadDto } from './payload.dto';
 
 export class CreateProofDto {
   @IsNotEmpty()
+  @ValidateNested()
   @Type(() => PayloadDto)
   payload: PayloadDto;
 

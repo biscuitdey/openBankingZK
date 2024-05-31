@@ -79,9 +79,9 @@ describe('VerifyProofDto', () => {
 
     // Assert
     expect(errors.length).toBe(1);
-    expect(errors[0].property).toEqual('publicInputs');
+    expect(errors[0].property).toEqual('publicWitness');
     expect(errors[0].constraints?.isNotEmpty).toContain(
-      SHOULD_NOT_BE_EMPTY_VALIDATION_MESSAGE('publicInputs'),
+      SHOULD_NOT_BE_EMPTY_VALIDATION_MESSAGE('publicWitness'),
     );
   });
 
@@ -107,9 +107,9 @@ describe('VerifyProofDto', () => {
 
     // Assert
     expect(errors.length).toBe(1);
-    expect(errors[0].property).toEqual('verificationKey');
+    expect(errors[0].property).toEqual('publicWitness');
     expect(errors[0].constraints?.isNotEmpty).toContain(
-      SHOULD_NOT_BE_EMPTY_VALIDATION_MESSAGE('verificationKey'),
+      SHOULD_NOT_BE_EMPTY_VALIDATION_MESSAGE('publicWitness'),
     );
   });
 
@@ -193,9 +193,9 @@ describe('VerifyProofDto', () => {
 
     // Assert
     expect(errors.length).toBe(1);
-    expect(errors[0].property).toEqual('publicInputs');
+    expect(errors[0].property).toEqual('publicKey');
     expect(errors[0].constraints?.isNotEmpty).toContain(
-      SHOULD_NOT_BE_EMPTY_VALIDATION_MESSAGE('publicInputs'),
+      SHOULD_NOT_BE_EMPTY_VALIDATION_MESSAGE('publicKey'),
     );
   });
 
