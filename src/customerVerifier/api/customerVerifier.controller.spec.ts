@@ -1,10 +1,6 @@
 import { classes } from '@automapper/classes';
 import { AutomapperModule } from '@automapper/nestjs';
-import {
-  BadRequestException,
-  NotFoundException,
-  UnauthorizedException,
-} from '@nestjs/common';
+import { NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { v4 } from 'uuid';
 import { CqrsModule } from '@nestjs/cqrs';
 import { Test, TestingModule } from '@nestjs/testing';
@@ -20,18 +16,16 @@ import { CustomerVerifierAgent } from '../agents/customerVerifier.agent';
 import { SnarkjsCircuitService } from '../service/circuit/snarkjs/snarkjs.service';
 import { CustomerVerifierProfile } from '../customerVerifier.profile';
 import { CustomerVerifier } from '../models/customerVerifier';
-import { ed25519 } from '@noble/curves/ed25519';
-import * as circomlib from 'circomlibjs';
-import * as crypto from 'crypto';
 import { Proof } from '../models/proof';
-import { INVALID_SIGNATURE } from './err.messages';
+import { INVALID_SIGNATURE, NOT_FOUND_ERR_MESSAGE } from './err.messages';
 import { PublicWitness } from '../models/publicWitness';
+import { VerifyProofDto } from './dtos/request/verifyProof.dto';
 
 describe('CustomerVerifierController', async () => {
   let vController: CustomerVerifierController;
   let customerVerifierStorageAgentMock: DeepMockProxy<CustomerVerifierStorageAgent>;
 
-  let existingCustomerVerifier: CustomerVerifier;
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const privateKey =
     'b5c90be10dc9e28540d9a5bc4e5b045514de86d7ca5c89dab68c4986f7fc17bf';
   const publicKey =
@@ -175,7 +169,7 @@ describe('CustomerVerifierController', async () => {
     w: '20402931748843538985151001264530049874871572933694634836567070693966133783803',
   };
 
-  existingCustomerVerifier = new CustomerVerifier(v4(), publicKey, proof);
+  const existingCustomerVerifier = new CustomerVerifier(v4(), publicKey, proof);
 
   beforeEach(async () => {
     const app: TestingModule = await Test.createTestingModule({
@@ -291,27 +285,28 @@ describe('CustomerVerifierController', async () => {
   describe('verifyProof', () => {
     it('should throw NotFound if non existent public key passed', () => {
       // Arrange
-      const nonExistentPk = '123';
-      verifierStorageAgentMock.getCustomerVerifierByPublicKey.mockResolvedValueOnce(
+      const publicWitness = { publicInputs, verificationKey } as PublicWitness;
+      const requestDto = { publicWitness, publicKey } as VerifyProofDto;
+      customerVerifierStorageAgentMock.getCustomerVerifierByPublicKey.mockResolvedValueOnce(
         undefined,
       );
 
       // Act and assert
       expect(async () => {
-        await vController.verifyProof(nonExistentPk);
+        await vController.verifyProof(requestDto);
       }).rejects.toThrow(new NotFoundException(NOT_FOUND_ERR_MESSAGE));
     });
 
     it('should verify customer details if proper public key is passed ', async () => {
       // Arrange
-      verifierStorageAgentMock.getCustomerVerifierByPublicKey.mockResolvedValueOnce(
+      const publicWitness = { publicInputs, verificationKey } as PublicWitness;
+      const requestDto = { publicWitness, publicKey } as VerifyProofDto;
+      customerVerifierStorageAgentMock.getCustomerVerifierByPublicKey.mockResolvedValueOnce(
         existingCustomerVerifier,
       );
 
       // Act
-      const isVerifiedCustomerProof = await vController.verifyProof(
-        existingPublicWitness,
-      );
+      const isVerifiedCustomerProof = await vController.verifyProof(requestDto);
 
       // Assert
       expect(isVerifiedCustomerProof).toEqual(true);

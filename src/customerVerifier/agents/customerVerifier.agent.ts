@@ -101,6 +101,10 @@ export class CustomerVerifierAgent {
     return witness;
   }
 
+  async verifyProofWitness(witness: Witness): Promise<boolean> {
+    return await this.circuitService.verifyProofUsingWitness(witness);
+  }
+
   async getPublicWitness(witness: Witness): Promise<PublicWitness> {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { proof, ...publicWitness } = witness;
