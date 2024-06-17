@@ -1,8 +1,9 @@
 import { Module } from '@nestjs/common';
-import { ProofModule } from './proof/proof.module';
+import { CustomerVerifierModule } from './customerVerifier/customerVerifier.module';
+import { PrismaService } from './shared/prisma/prisma.service';
 
 @Module({
-  imports: [ProofModule],
-  providers: [],
+  imports: [CustomerVerifierModule],
+  providers: [PrismaService],
 })
 export class AppModule {}
