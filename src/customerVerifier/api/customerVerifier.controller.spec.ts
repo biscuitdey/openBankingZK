@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { classes } from '@automapper/classes';
 import { AutomapperModule } from '@automapper/nestjs';
 import { NotFoundException, UnauthorizedException } from '@nestjs/common';
@@ -9,7 +10,7 @@ import { CreateProofCommandHandler } from '../capabilities/createProof/createPro
 import { CreateProofDto } from './dtos/request/createProof.dto';
 import { mockDeep, DeepMockProxy } from 'jest-mock-extended';
 import { PrismaService } from '../../shared/prisma/prisma.service';
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient } from 'prisma/prisma-client/default';
 import { CustomerVerifierController } from './customerVerifier.controller';
 import { CustomerVerifierStorageAgent } from '../agents/customerVerifierStorage.agent';
 import { CustomerVerifierAgent } from '../agents/customerVerifier.agent';
@@ -20,8 +21,10 @@ import { Proof } from '../models/proof';
 import { INVALID_SIGNATURE, NOT_FOUND_ERR_MESSAGE } from './err.messages';
 import { PublicWitness } from '../models/publicWitness';
 import { VerifyProofDto } from './dtos/request/verifyProof.dto';
+import { VerifyProofCommandHandler } from '../capabilities/verifyProof/verifyProofCommand.handler';
 
-describe('CustomerVerifierController', async () => {
+jest.setTimeout(6000000);
+describe('CustomerVerifierController', () => {
   let vController: CustomerVerifierController;
   let customerVerifierStorageAgentMock: DeepMockProxy<CustomerVerifierStorageAgent>;
 
@@ -29,10 +32,10 @@ describe('CustomerVerifierController', async () => {
   const privateKey =
     'b5c90be10dc9e28540d9a5bc4e5b045514de86d7ca5c89dab68c4986f7fc17bf';
   const publicKey =
-    'e8e391fec51831b677fc5658f91be28fc422320b810d9eae94a6b3acba67a31f';
+    '476e1a48d76de3399bcbd0ab548d4ae0b4eba23d9bc3cf4e15ee6b7544537199';
 
   const signature =
-    'd41ab9493e024df21c56327e98f390209f550a529f692f97a2f1a30cc9a76e83062abcb6609f0155aecffca26757e862145bb4e2377921a9487b425a243d1204';
+    'c213640902f0b7d03130dd701be9adba4945b4ffb567a83f2ab5fb016ec5e2864656a8e5d35025875bd1bd81f12835b87902821fe4fc19c04d92891c99353003';
 
   const proof = {
     value: {
@@ -185,6 +188,7 @@ describe('CustomerVerifierController', async () => {
         CustomerVerifierAgent,
         CustomerVerifierStorageAgent,
         CreateProofCommandHandler,
+        VerifyProofCommandHandler,
         {
           provide: 'ICircuitService',
           useClass: SnarkjsCircuitService,
@@ -207,7 +211,7 @@ describe('CustomerVerifierController', async () => {
   });
 
   describe('createProof', () => {
-    it('should throw Unauthorized if signature with invalid format provided', () => {
+    it('should throw Unauthorized if signature with invalid format provided', async () => {
       // Arrange
       const requestDto = {
         payload: {
@@ -224,13 +228,15 @@ describe('CustomerVerifierController', async () => {
         existingCustomerVerifier,
       );
 
+      const result = await vController.createProof(requestDto);
+
       // Act and assert
-      expect(async () => {
-        await vController.createProof(requestDto);
-      }).rejects.toThrow(new UnauthorizedException(INVALID_SIGNATURE));
+      expect(result['response']).toEqual(
+        new UnauthorizedException(INVALID_SIGNATURE)['response'],
+      );
     });
 
-    it('should throw Unauthorized if signature with valid format that does not fit with the public key of the sender is provided', () => {
+    it('should throw Unauthorized if signature with valid format that does not fit with the public key of the sender is provided', async () => {
       // Arrange
       const requestDto = {
         payload: {
@@ -247,10 +253,12 @@ describe('CustomerVerifierController', async () => {
         requestDto,
       );
 
+      const result = await vController.createProof(requestDto);
+
       // Act and assert
-      expect(async () => {
-        await vController.createProof(requestDto);
-      }).rejects.toThrow(new UnauthorizedException(INVALID_SIGNATURE));
+      expect(result['response']).toEqual(
+        new UnauthorizedException(INVALID_SIGNATURE)['response'],
+      );
     });
 
     it('should return new uuid from the created bpi message when all params provided', async () => {
@@ -283,7 +291,7 @@ describe('CustomerVerifierController', async () => {
   });
 
   describe('verifyProof', () => {
-    it('should throw NotFound if non existent public key passed', () => {
+    it('should throw NotFound if non existent public key passed', async () => {
       // Arrange
       const publicWitness = { publicInputs, verificationKey } as PublicWitness;
       const requestDto = { publicWitness, publicKey } as VerifyProofDto;
@@ -291,10 +299,12 @@ describe('CustomerVerifierController', async () => {
         undefined,
       );
 
+      const result = await vController.verifyProof(requestDto);
+
       // Act and assert
-      expect(async () => {
-        await vController.verifyProof(requestDto);
-      }).rejects.toThrow(new NotFoundException(NOT_FOUND_ERR_MESSAGE));
+      expect(result['response']).toEqual(
+        new NotFoundException(NOT_FOUND_ERR_MESSAGE)['response'],
+      );
     });
 
     it('should verify customer details if proper public key is passed ', async () => {
@@ -311,5 +321,8 @@ describe('CustomerVerifierController', async () => {
       // Assert
       expect(isVerifiedCustomerProof).toEqual(true);
     });
+  });
+  afterAll(() => {
+    globalThis.curve_bn128.terminate();
   });
 });

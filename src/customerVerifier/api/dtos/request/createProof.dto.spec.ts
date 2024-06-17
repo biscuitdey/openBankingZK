@@ -22,9 +22,9 @@ describe('CreateProofDto', () => {
 
     // Assert
     expect(errors.length).toBe(1);
-    expect(errors[0].property).toEqual('payload');
-    expect(errors[0].constraints?.isNotEmpty).toContain(
-      SHOULD_NOT_BE_EMPTY_VALIDATION_MESSAGE('payload'),
+    expect(errors[0].children[0].property).toEqual('name');
+    expect(errors[0].children[0].constraints?.isNotEmpty).toContain(
+      SHOULD_NOT_BE_EMPTY_VALIDATION_MESSAGE('name'),
     );
   });
 
@@ -46,9 +46,9 @@ describe('CreateProofDto', () => {
 
     // Assert
     expect(errors.length).toBe(1);
-    expect(errors[0].property).toEqual('payload');
-    expect(errors[0].constraints?.isNotEmpty).toContain(
-      SHOULD_NOT_BE_EMPTY_VALIDATION_MESSAGE('payload'),
+    expect(errors[0].children[0].property).toEqual('bankName');
+    expect(errors[0].children[0].constraints?.isNotEmpty).toContain(
+      SHOULD_NOT_BE_EMPTY_VALIDATION_MESSAGE('bankName'),
     );
   });
 
@@ -70,9 +70,9 @@ describe('CreateProofDto', () => {
 
     // Assert
     expect(errors.length).toBe(1);
-    expect(errors[0].property).toEqual('payload');
-    expect(errors[0].constraints?.isNotEmpty).toContain(
-      SHOULD_NOT_BE_EMPTY_VALIDATION_MESSAGE('payload'),
+    expect(errors[0].children[0].property).toEqual('accountNumber');
+    expect(errors[0].children[0].constraints?.isNotEmpty).toContain(
+      SHOULD_NOT_BE_EMPTY_VALIDATION_MESSAGE('accountNumber'),
     );
   });
 
@@ -94,9 +94,9 @@ describe('CreateProofDto', () => {
 
     // Assert
     expect(errors.length).toBe(1);
-    expect(errors[0].property).toEqual('payload');
-    expect(errors[0].constraints?.isNotEmpty).toContain(
-      SHOULD_NOT_BE_EMPTY_VALIDATION_MESSAGE('payload'),
+    expect(errors[0].children[0].property).toEqual('ifsc');
+    expect(errors[0].children[0].constraints?.isNotEmpty).toContain(
+      SHOULD_NOT_BE_EMPTY_VALIDATION_MESSAGE('ifsc'),
     );
   });
 

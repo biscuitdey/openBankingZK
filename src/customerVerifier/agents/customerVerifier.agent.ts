@@ -18,13 +18,17 @@ export class CustomerVerifierAgent {
     @Inject('ICircuitService') private readonly circuitService: ICircuitService,
     private readonly logger: LoggingService,
   ) {}
-  throwIfSignatureVerificationFails(
+  async throwIfSignatureVerificationFails(
     message: string,
     signature: string,
     publicKey: string,
-  ): void {
+  ): Promise<void> {
     if (
-      !this.verifyEddsaSignatureAgainstPublicKey(message, signature, publicKey)
+      !(await this.verifyEddsaSignatureAgainstPublicKey(
+        message,
+        signature,
+        publicKey,
+      ))
     ) {
       throw new UnauthorizedException(INVALID_SIGNATURE);
     }
@@ -35,34 +39,38 @@ export class CustomerVerifierAgent {
     signature: string,
     senderPublicKey: string,
   ): Promise<boolean> {
-    const eddsa = await buildEddsa();
-    const babyJub = await buildBabyjub();
+    try {
+      const eddsa = await buildEddsa();
+      const babyJub = await buildBabyjub();
 
-    const hashedPayload = crypto
-      .createHash(`${process.env.MERKLE_TREE_HASH_ALGH}`)
-      .update(JSON.stringify(message))
-      .digest();
+      const hashedPayload = crypto
+        .createHash(`${process.env.HASH_ALG}`)
+        .update(message)
+        .digest();
 
-    const publicKey = Uint8Array.from(Buffer.from(senderPublicKey, 'hex'));
-    const publicKeyPoints = babyJub.unpackPoint(publicKey);
+      const publicKey = Uint8Array.from(Buffer.from(senderPublicKey, 'hex'));
+      const publicKeyPoints = babyJub.unpackPoint(publicKey);
 
-    const eddsaSignature = Uint8Array.from(Buffer.from(signature, 'hex'));
+      const eddsaSignature = Uint8Array.from(Buffer.from(signature, 'hex'));
 
-    const unpackedSignature = eddsa.unpackSignature(eddsaSignature);
+      const unpackedSignature = eddsa.unpackSignature(eddsaSignature);
 
-    const isValid = eddsa.verifyPedersen(
-      hashedPayload,
-      unpackedSignature,
-      publicKeyPoints,
-    );
-
-    if (!isValid) {
-      this.logger.logWarn(
-        `Signature: ${signature} for public key ${senderPublicKey} is invalid.`,
+      const isValid = eddsa.verifyPedersen(
+        hashedPayload,
+        unpackedSignature,
+        publicKeyPoints,
       );
-    }
 
-    return isValid;
+      if (!isValid) {
+        this.logger.logWarn(
+          `Signature: ${signature} for public key ${senderPublicKey} is invalid.`,
+        );
+      }
+
+      return isValid;
+    } catch (error) {
+      throw new UnauthorizedException(INVALID_SIGNATURE);
+    }
   }
 
   async createCustomerVerifier(
@@ -119,7 +127,7 @@ export class CustomerVerifierAgent {
     circuitWitnessCalculatorPath: string;
     circuitWitnessFilePath: string;
   } {
-    const snakeCaseWorkstepName = this.convertStringToSnakeCase(name);
+    const snakeCaseWorkstepName = name; //this.convertStringToSnakeCase(name);
 
     const circuitProvingKeyPath =
       process.env.SNARKJS_CIRCUITS_PATH +
@@ -145,7 +153,7 @@ export class CustomerVerifierAgent {
       '.wasm';
 
     const circuitWitnessCalculatorPath =
-      '../../../../../.' +
+      '../../../../.' +
       process.env.SNARKJS_CIRCUITS_PATH +
       snakeCaseWorkstepName +
       '/' +

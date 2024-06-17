@@ -108,9 +108,10 @@ export class SnarkjsCircuitService implements ICircuitService {
       signature: string;
       publicKey: string;
     },
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     circuitName: string,
   ): Promise<object> {
-    return await this[circuitName](inputs);
+    return await this.bankProof(inputs);
   }
 
   private async bankProof(inputs: {

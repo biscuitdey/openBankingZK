@@ -16,19 +16,25 @@ export class VerifyProofCommandHandler
   ) {}
 
   async execute(command: VerifyProofCommand) {
-    const customerVerifier =
-      await this.storageAgent.getCustomerVerifierByPublicKey(command.publicKey);
+    try {
+      const customerVerifier =
+        await this.storageAgent.getCustomerVerifierByPublicKey(
+          command.publicKey,
+        );
 
-    if (!customerVerifier) {
-      throw new NotFoundException(NOT_FOUND_ERR_MESSAGE);
+      if (!customerVerifier) {
+        throw new NotFoundException(NOT_FOUND_ERR_MESSAGE);
+      }
+
+      const witness = {
+        proof: customerVerifier.proof,
+        publicInputs: command.publicWitness.publicInputs,
+        verificationKey: command.publicWitness.verificationKey,
+      } as Witness;
+
+      return await this.agent.verifyProofWitness(witness);
+    } catch (error) {
+      return error;
     }
-
-    const witness = {
-      proof: customerVerifier.proof,
-      publicInputs: command.publicWitness.publicInputs,
-      verificationKey: command.publicWitness.verificationKey,
-    } as Witness;
-
-    return await this.agent.verifyProofWitness(witness);
   }
 }
