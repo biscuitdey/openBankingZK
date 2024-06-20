@@ -1,5 +1,6 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { ValidationPipe } from '@nestjs/common';
 
 async function bootstrap() {
@@ -9,7 +10,7 @@ async function bootstrap() {
       transform: true,
     }),
   );
-  app.enableCors();
-  await app.listen(3000);
+  //app.enableCors();
+  await app.listen(4000);
 }
 bootstrap();
