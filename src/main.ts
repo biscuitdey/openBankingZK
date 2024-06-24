@@ -10,7 +10,20 @@ async function bootstrap() {
       transform: true,
     }),
   );
-  //app.enableCors();
+  app.enableCors({
+    origin: [
+      'https://127.0.0.1:3000/',
+      'https://localhost:3000/',
+      'https://127.0.0.1:3000/',
+      'https://localhost:3000/',
+      'http://127.0.0.1:3000/',
+      'http://localhost:3000/',
+      'http://127.0.0.1:3000/',
+      'http://localhost:3000/',
+    ],
+    methods: ['GET', 'HEAD', 'PUT', 'PATCH', 'POST', 'DELETE'],
+    credentials: true,
+  });
   await app.listen(4000);
 }
 bootstrap();
