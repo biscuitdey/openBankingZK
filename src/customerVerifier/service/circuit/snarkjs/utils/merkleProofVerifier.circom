@@ -4,7 +4,7 @@ include "../../../../../../../node_modules/circomlib/circuits/sha256/sha256.circ
 include "../../../../../../../node_modules/circomlib/circuits/comparators.circom";
 include "../../../../../../../node_modules/circomlib/circuits/bitify.circom";
 
-template MerkleProofVerifier(nodes){
+template MerkleCertificateVerifier(nodes){
 	signal input leaf;
    	signal input root;
     	signal input pathElements[nodes];

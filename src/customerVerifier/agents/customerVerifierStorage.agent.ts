@@ -23,7 +23,7 @@ export class CustomerVerifierStorageAgent {
 
     customerVerifierRecord = {
       ...customerVerifierRecord,
-      proof: JSON.parse(customerVerifierRecord.proof),
+      certificate: JSON.parse(customerVerifierRecord.certificate),
     };
 
     const customerVerifier = this.mapper.map(
@@ -47,7 +47,7 @@ export class CustomerVerifierStorageAgent {
 
     customerVerifierRecord = {
       ...customerVerifierRecord,
-      proof: JSON.parse(customerVerifierRecord.proof),
+      certificate: JSON.parse(customerVerifierRecord.certificate),
     };
 
     const customerVerifier = this.mapper.map(
@@ -65,7 +65,7 @@ export class CustomerVerifierStorageAgent {
       data: {
         id: verifier.id,
         publicKey: verifier.publicKey,
-        proof: JSON.stringify(verifier.proof),
+        certificate: JSON.stringify(verifier.certificate),
       },
     });
 
@@ -81,7 +81,7 @@ export class CustomerVerifierStorageAgent {
         data: {
           id: verifier.id,
           publicKey: verifier.publicKey,
-          proof: JSON.stringify(verifier.proof),
+          certificate: JSON.stringify(verifier.certificate),
         },
       });
 

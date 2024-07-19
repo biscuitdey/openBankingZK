@@ -1,5 +1,5 @@
 import { AutoMap } from '@automapper/classes';
-import { Proof } from './proof';
+import { Certificate } from './certificate';
 
 export class CustomerVerifier {
   @AutoMap()
@@ -9,20 +9,20 @@ export class CustomerVerifier {
   publicKey: string;
 
   @AutoMap()
-  proof: Proof;
+  certificate: Certificate;
 
-  constructor(id: string, publicKey: string, proof: Proof) {
+  constructor(id: string, publicKey: string, certificate: Certificate) {
     this.id = id;
     this.publicKey = publicKey;
-    this.proof = proof;
+    this.certificate = certificate;
   }
 
   public updatePublicKey(newPublicKey: string): void {
     this.publicKey = newPublicKey;
   }
 
-  public updateProof(newProof: Proof): void {
-    this.proof = newProof;
+  public updateCertificate(newCertificate: Certificate): void {
+    this.certificate = newCertificate;
   }
 
   public updateId(newId: string): void {

@@ -1,21 +1,21 @@
 import { Body, Controller, Post } from '@nestjs/common';
 import { CommandBus } from '@nestjs/cqrs';
-import { CreateProofCommand } from '../capabilities/createProof/createProof.command';
-import { CreateProofDto } from './dtos/request/createProof.dto';
+import { CreateCertificateCommand } from '../capabilities/createCertificate/createCertificate.command';
+import { CreateCertificateDto } from './dtos/request/createCertificate.dto';
 import { PublicWitnessDto } from './dtos/response/publicWitness.dto';
-import { VerifyProofDto } from './dtos/request/verifyProof.dto';
-import { VerifyProofCommand } from '../capabilities/verifyProof/verifyProof.command';
+import { VerifyCertificateDto } from './dtos/request/verifyCertificate.dto';
+import { VerifyCertificateCommand } from '../capabilities/verifyCertificate/verifyCertificate.command';
 
-@Controller('proof')
+@Controller('certificate')
 export class CustomerVerifierController {
   constructor(private commandBus: CommandBus) {}
 
   @Post('/create')
-  async createProof(
-    @Body() requestDto: CreateProofDto,
+  async createCertificate(
+    @Body() requestDto: CreateCertificateDto,
   ): Promise<PublicWitnessDto> {
     return await this.commandBus.execute(
-      new CreateProofCommand(
+      new CreateCertificateCommand(
         requestDto.payload,
         requestDto.signature,
         requestDto.publicKey,
@@ -24,9 +24,14 @@ export class CustomerVerifierController {
   }
 
   @Post('verify')
-  async verifyProof(@Body() requestDto: VerifyProofDto): Promise<boolean> {
+  async verifyCertificate(
+    @Body() requestDto: VerifyCertificateDto,
+  ): Promise<boolean> {
     return await this.commandBus.execute(
-      new VerifyProofCommand(requestDto.publicWitness, requestDto.publicKey),
+      new VerifyCertificateCommand(
+        requestDto.publicWitness,
+        requestDto.publicKey,
+      ),
     );
   }
 }

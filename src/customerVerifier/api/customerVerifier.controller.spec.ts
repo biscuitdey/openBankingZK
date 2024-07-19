@@ -6,8 +6,8 @@ import { v4 } from 'uuid';
 import { CqrsModule } from '@nestjs/cqrs';
 import { Test, TestingModule } from '@nestjs/testing';
 import { LoggingModule } from '../../shared/logging/logging.module';
-import { CreateProofCommandHandler } from '../capabilities/createProof/createProofCommand.handler';
-import { CreateProofDto } from './dtos/request/createProof.dto';
+import { CreateCertificateCommandHandler } from '../capabilities/createCertificate/createCertificateCommand.handler';
+import { CreateCertificateDto } from './dtos/request/createCertificate.dto';
 import { mockDeep, DeepMockProxy } from 'jest-mock-extended';
 import { PrismaService } from '../../shared/prisma/prisma.service';
 import { PrismaClient } from 'prisma/prisma-client/default';
@@ -17,11 +17,11 @@ import { CustomerVerifierAgent } from '../agents/customerVerifier.agent';
 import { SnarkjsCircuitService } from '../service/circuit/snarkjs/snarkjs.service';
 import { CustomerVerifierProfile } from '../customerVerifier.profile';
 import { CustomerVerifier } from '../models/customerVerifier';
-import { Proof } from '../models/proof';
+import { Certificate } from '../models/certificate';
 import { INVALID_SIGNATURE, NOT_FOUND_ERR_MESSAGE } from './err.messages';
 import { PublicWitness } from '../models/publicWitness';
-import { VerifyProofDto } from './dtos/request/verifyProof.dto';
-import { VerifyProofCommandHandler } from '../capabilities/verifyProof/verifyProofCommand.handler';
+import { VerifyCertificateDto } from './dtos/request/verifyCertificate.dto';
+import { VerifyCertificateCommandHandler } from '../capabilities/verifyCertificate/verifyCertificateCommand.handler';
 
 jest.setTimeout(6000000);
 describe('CustomerVerifierController', () => {
@@ -37,7 +37,7 @@ describe('CustomerVerifierController', () => {
   const signature =
     'c213640902f0b7d03130dd701be9adba4945b4ffb567a83f2ab5fb016ec5e2864656a8e5d35025875bd1bd81f12835b87902821fe4fc19c04d92891c99353003';
 
-  const proof = {
+  const certificate = {
     value: {
       A: [
         '17988788482483610602625948405788680786155763106929166591292026448090960242671',
@@ -101,7 +101,7 @@ describe('CustomerVerifierController', () => {
     },
     protocol: 'plonk',
     curve: 'bn128',
-  } as Proof;
+  } as Certificate;
 
   const publicInputs = [
     '1',
@@ -172,7 +172,11 @@ describe('CustomerVerifierController', () => {
     w: '20402931748843538985151001264530049874871572933694634836567070693966133783803',
   };
 
-  const existingCustomerVerifier = new CustomerVerifier(v4(), publicKey, proof);
+  const existingCustomerVerifier = new CustomerVerifier(
+    v4(),
+    publicKey,
+    certificate,
+  );
 
   beforeEach(async () => {
     const app: TestingModule = await Test.createTestingModule({
@@ -187,8 +191,8 @@ describe('CustomerVerifierController', () => {
       providers: [
         CustomerVerifierAgent,
         CustomerVerifierStorageAgent,
-        CreateProofCommandHandler,
-        VerifyProofCommandHandler,
+        CreateCertificateCommandHandler,
+        VerifyCertificateCommandHandler,
         {
           provide: 'ICircuitService',
           useClass: SnarkjsCircuitService,
@@ -210,7 +214,7 @@ describe('CustomerVerifierController', () => {
     await app.init();
   });
 
-  describe('createProof', () => {
+  describe('createCertificate', () => {
     it('should throw Unauthorized if signature with invalid format provided', async () => {
       // Arrange
       const requestDto = {
@@ -222,13 +226,13 @@ describe('CustomerVerifierController', () => {
         },
         signature: '213432',
         publicKey,
-      } as CreateProofDto;
+      } as CreateCertificateDto;
 
       customerVerifierStorageAgentMock.storeCustomerVerifier.mockResolvedValueOnce(
         existingCustomerVerifier,
       );
 
-      const result = await vController.createProof(requestDto);
+      const result = await vController.createCertificate(requestDto);
 
       // Act and assert
       expect(result['response']).toEqual(
@@ -247,13 +251,13 @@ describe('CustomerVerifierController', () => {
         },
         signature,
         publicKey: '342354',
-      } as CreateProofDto;
+      } as CreateCertificateDto;
 
       customerVerifierStorageAgentMock.storeCustomerVerifier.mockRejectedValueOnce(
         requestDto,
       );
 
-      const result = await vController.createProof(requestDto);
+      const result = await vController.createCertificate(requestDto);
 
       // Act and assert
       expect(result['response']).toEqual(
@@ -272,7 +276,7 @@ describe('CustomerVerifierController', () => {
         },
         signature,
         publicKey,
-      } as CreateProofDto;
+      } as CreateCertificateDto;
 
       const expectedResponse = {
         publicInputs,
@@ -283,23 +287,23 @@ describe('CustomerVerifierController', () => {
       );
 
       // Act
-      const response = await vController.createProof(requestDto);
+      const response = await vController.createCertificate(requestDto);
 
       // Assert
       expect(response.publicInputs).toEqual(expectedResponse.publicInputs);
     });
   });
 
-  describe('verifyProof', () => {
+  describe('verifyCertificate', () => {
     it('should throw NotFound if non existent public key passed', async () => {
       // Arrange
       const publicWitness = { publicInputs, verificationKey } as PublicWitness;
-      const requestDto = { publicWitness, publicKey } as VerifyProofDto;
+      const requestDto = { publicWitness, publicKey } as VerifyCertificateDto;
       customerVerifierStorageAgentMock.getCustomerVerifierByPublicKey.mockResolvedValueOnce(
         undefined,
       );
 
-      const result = await vController.verifyProof(requestDto);
+      const result = await vController.verifyCertificate(requestDto);
 
       // Act and assert
       expect(result['response']).toEqual(
@@ -310,16 +314,17 @@ describe('CustomerVerifierController', () => {
     it('should verify customer details if proper public key is passed ', async () => {
       // Arrange
       const publicWitness = { publicInputs, verificationKey } as PublicWitness;
-      const requestDto = { publicWitness, publicKey } as VerifyProofDto;
+      const requestDto = { publicWitness, publicKey } as VerifyCertificateDto;
       customerVerifierStorageAgentMock.getCustomerVerifierByPublicKey.mockResolvedValueOnce(
         existingCustomerVerifier,
       );
 
       // Act
-      const isVerifiedCustomerProof = await vController.verifyProof(requestDto);
+      const isVerifiedCustomerCertificate =
+        await vController.verifyCertificate(requestDto);
 
       // Assert
-      expect(isVerifiedCustomerProof).toEqual(true);
+      expect(isVerifiedCustomerCertificate).toEqual(true);
     });
   });
   afterAll(() => {

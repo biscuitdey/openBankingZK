@@ -1,12 +1,12 @@
 import { Injectable, BadRequestException } from '@nestjs/common';
 import { Witness } from '../../../models/witness';
-import { Proof } from '../../../models/proof';
+import { Certificate } from '../../../models/certificate';
 import { ICircuitService } from '../circuitService.interface';
 import { computeEddsaSigPublicInputs } from './utils/computePublicInputs';
 import * as snarkjs from 'snarkjs';
 import * as fs from 'fs';
 import * as crypto from 'crypto';
-import { Payload } from 'src/customerVerifier/models/payload';
+import { Payload } from '../../../models/payload';
 
 @Injectable()
 export class SnarkjsCircuitService implements ICircuitService {
@@ -37,7 +37,7 @@ export class SnarkjsCircuitService implements ICircuitService {
 
     const preparedInputs = await this.prepareInputs(inputs, circuitName);
 
-    const { proof, publicInputs } = await this.executeCircuit(
+    const { certificate, publicInputs } = await this.executeCircuit(
       preparedInputs,
       pathToCircuit,
       pathToProvingKey,
@@ -45,7 +45,7 @@ export class SnarkjsCircuitService implements ICircuitService {
       pathToWitnessFile,
     );
 
-    this.witness.proof = proof;
+    this.witness.certificate = certificate;
 
     this.witness.publicInputs = publicInputs;
 
@@ -63,11 +63,13 @@ export class SnarkjsCircuitService implements ICircuitService {
     return this.witness;
   }
 
-  public async verifyProofUsingWitness(witness: Witness): Promise<boolean> {
+  public async verifyCertificateUsingWitness(
+    witness: Witness,
+  ): Promise<boolean> {
     const isVerified = await snarkjs.plonk.verify(
       witness.verificationKey,
       witness.publicInputs,
-      witness.proof.value,
+      witness.certificate.value,
     );
     return isVerified;
   }
@@ -78,7 +80,7 @@ export class SnarkjsCircuitService implements ICircuitService {
     pathToProvingKey: string,
     pathToWitnessCalculator: string,
     pathToWitnessFile: string,
-  ): Promise<{ proof: Proof; publicInputs: string[] }> {
+  ): Promise<{ certificate: Certificate; publicInputs: string[] }> {
     const buffer = fs.readFileSync(pathToCircuit);
     const wc = await import(pathToWitnessCalculator);
     const witnessCalculator = await wc(buffer);
@@ -86,20 +88,18 @@ export class SnarkjsCircuitService implements ICircuitService {
     const buff = await witnessCalculator.calculateWTNSBin(inputs, 0);
     fs.writeFileSync(pathToWitnessFile, buff);
 
-    const { proof, publicSignals: publicInputs } = await snarkjs.plonk.prove(
-      pathToProvingKey,
-      pathToWitnessFile,
-    );
+    const { proof: certificate, publicSignals: publicInputs } =
+      await snarkjs.plonk.prove(pathToProvingKey, pathToWitnessFile);
 
     await this.throwIfCreateWitnessInputInvalid(publicInputs);
 
-    const newProof = {
-      value: proof,
-      protocol: proof.protocol,
-      curve: proof.curve,
-    } as Proof;
+    const newCertificate = {
+      value: certificate,
+      protocol: certificate.protocol,
+      curve: certificate.curve,
+    } as Certificate;
 
-    return { proof: newProof, publicInputs };
+    return { certificate: newCertificate, publicInputs };
   }
 
   private async prepareInputs(
@@ -111,10 +111,10 @@ export class SnarkjsCircuitService implements ICircuitService {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     circuitName: string,
   ): Promise<object> {
-    return await this.bankProof(inputs);
+    return await this.bankCertificate(inputs);
   }
 
-  private async bankProof(inputs: {
+  private async bankCertificate(inputs: {
     payload: Payload;
     signature: string;
     publicKey: string;

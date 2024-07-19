@@ -10,5 +10,5 @@ export interface ICircuitService {
     pathToWitnessCalculator?: string,
     pathToWitnessFile?: string,
   ): Promise<Witness>;
-  verifyProofUsingWitness(witness: Witness): Promise<boolean>;
+  verifyCertificateUsingWitness(witness: Witness): Promise<boolean>;
 }
