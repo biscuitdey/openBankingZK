@@ -1,7 +1,7 @@
-import { Proof } from './proof';
+import { Certificate } from './certificate';
 
 export class Witness {
-  proof: Proof;
+  certificate: Certificate;
 
   publicInputs?: string[];
 

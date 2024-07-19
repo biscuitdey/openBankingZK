@@ -2,8 +2,8 @@ import { Module } from '@nestjs/common';
 import { CqrsModule } from '@nestjs/cqrs';
 import { SnarkjsCircuitService } from './service/circuit/snarkjs/snarkjs.service';
 import { LoggingModule } from '../shared/logging/logging.module';
-import { CreateProofCommandHandler } from './capabilities/createProof/createProofCommand.handler';
-import { VerifyProofCommandHandler } from './capabilities/verifyProof/verifyProofCommand.handler';
+import { CreateCertificateCommandHandler } from './capabilities/createCertificate/createCertificateCommand.handler';
+import { VerifyCertificateCommandHandler } from './capabilities/verifyCertificate/verifyCertificateCommand.handler';
 import { PrismaModule } from '../shared/prisma/prisma.module';
 import { CustomerVerifierController } from './api/customerVerifier.controller';
 import { CustomerVerifierAgent } from './agents/customerVerifier.agent';
@@ -11,8 +11,8 @@ import { CustomerVerifierStorageAgent } from './agents/customerVerifierStorage.a
 import { CustomerVerifierProfile } from './customerVerifier.profile';
 
 export const CommandHandlers = [
-  CreateProofCommandHandler,
-  VerifyProofCommandHandler,
+  CreateCertificateCommandHandler,
+  VerifyCertificateCommandHandler,
 ];
 
 @Module({

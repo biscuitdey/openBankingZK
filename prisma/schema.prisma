@@ -16,5 +16,5 @@ datasource db {
 model CustomerVerifier {
   id                String     @id @default(uuid())
   publicKey         String     @unique
-  proof             String
+  certificate             String
 }

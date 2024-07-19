@@ -10,7 +10,7 @@ import { ICircuitService } from '../service/circuit/circuitService.interface';
 import 'dotenv/config';
 import { PublicWitness } from '../models/publicWitness';
 import { CustomerVerifier } from '../models/customerVerifier';
-import { Proof } from '../models/proof';
+import { Certificate } from '../models/certificate';
 
 @Injectable()
 export class CustomerVerifierAgent {
@@ -75,12 +75,12 @@ export class CustomerVerifierAgent {
 
   async createCustomerVerifier(
     publicKey: string,
-    proof: Proof,
+    certificate: Certificate,
   ): Promise<CustomerVerifier> {
-    return new CustomerVerifier(v4(), publicKey, proof);
+    return new CustomerVerifier(v4(), publicKey, certificate);
   }
 
-  async createProofWitness(
+  async createCertificateWitness(
     payload: Payload,
     signature: string,
     publicKey: string,
@@ -109,13 +109,13 @@ export class CustomerVerifierAgent {
     return witness;
   }
 
-  async verifyProofWitness(witness: Witness): Promise<boolean> {
-    return await this.circuitService.verifyProofUsingWitness(witness);
+  async verifyCertificateWitness(witness: Witness): Promise<boolean> {
+    return await this.circuitService.verifyCertificateUsingWitness(witness);
   }
 
   async getPublicWitness(witness: Witness): Promise<PublicWitness> {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { proof, ...publicWitness } = witness;
+    const { certificate, ...publicWitness } = witness;
     return publicWitness as PublicWitness;
   }
 

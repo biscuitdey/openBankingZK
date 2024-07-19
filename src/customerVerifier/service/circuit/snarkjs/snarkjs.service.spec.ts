@@ -39,19 +39,19 @@ describe('SnarkjsService', () => {
     inputs = { payload, signature, publicKey: eddsaPublicKey };
   });
 
-  it('creates witness for bank proof', async () => {
-    const circuitName = 'bankProof';
+  it('creates witness for bank certificate', async () => {
+    const circuitName = 'bankCertificate';
     const pathToCircuit =
-      './zeroKnowledgeArtifacts/circuits/bankProof/bankProof_js/bankProof.wasm';
+      './zeroKnowledgeArtifacts/circuits/bankCertificate/bankCertificate_js/bankCertificate.wasm';
     const pathToProvingKey =
-      './zeroKnowledgeArtifacts/circuits/bankProof/bankProof_final.zkey';
+      './zeroKnowledgeArtifacts/circuits/bankCertificate/bankCertificate_final.zkey';
     const pathToVerificationKey =
-      './zeroKnowledgeArtifacts/circuits/bankProof/bankProof_verification_key.json';
+      './zeroKnowledgeArtifacts/circuits/bankCertificate/bankCertificate_verification_key.json';
     const pathToWitnessCalculator =
-      '../../../../../zeroKnowledgeArtifacts/circuits/bankProof/bankProof_js/witness_calculator.js';
+      '../../../../../zeroKnowledgeArtifacts/circuits/bankCertificate/bankCertificate_js/witness_calculator.js';
 
     const pathToWitnessFile =
-      './zeroKnowledgeArtifacts/circuits/bankProof/witness.txt';
+      './zeroKnowledgeArtifacts/circuits/bankCertificate/witness.txt';
 
     witness = await snarkjs.createWitness(
       inputs,
@@ -66,8 +66,8 @@ describe('SnarkjsService', () => {
     expect(typeof witness).toEqual('object');
   });
 
-  it('verifies witness for bankProof', async () => {
-    const isVerified = await snarkjs.verifyProofUsingWitness(witness);
+  it('verifies witness for bankCertificate', async () => {
+    const isVerified = await snarkjs.verifyCertificateUsingWitness(witness);
     expect(isVerified).toBe(true);
   });
 
